@@ -1,45 +1,39 @@
 #include <iostream>
 #include <string>
 using namespace std;
-#include "doublelinkedlist.cpp"
+#include "doublelinkedlist.h" // Menggunakan file .cpp langsung
 
-class queue
-{
+// Define the Antrian class
+class Antrian {
 private:
     int maks;
     int count;
-    DoubleLinkedList *list;
+    DoubleLinkedList* list;
 
 public:
-    queue();
+    Antrian();
+    ~Antrian();
+
     bool isFull();
     bool isEmpty();
     void enqueue(string data);
     void dequeue();
+    int HitungAntrian();
     void Tampil();
     void destroy();
-    int HitungAntrian();
-    ~queue();
 };
 
-queue::queue()
-{
-    maks = 5;
-    count = 0;
-    list = new DoubleLinkedList();
-}
-
-bool queue::isFull()
+bool Antrian::isFull()
 {
     return (count == maks);
 }
 
-bool queue::isEmpty()
+bool Antrian::isEmpty()
 {
     return (count == 0);
 }
 
-void queue::enqueue(string data)
+void Antrian::enqueue(string data)
 {
     if (isFull())
     {
@@ -50,7 +44,7 @@ void queue::enqueue(string data)
     count++;
 }
 
-void queue::dequeue()
+void Antrian::dequeue()
 {
     if (isEmpty())
     {
@@ -61,19 +55,19 @@ void queue::dequeue()
     count--;
 }
 
-int queue::HitungAntrian()
+int Antrian::HitungAntrian()
 {
     return count;
 }
 
-void queue::Tampil()
+void Antrian::Tampil()
 {
     cout << "Antrian Order" << endl;
     list->displayList();
     cout << "Jumlah Antrian : " << HitungAntrian() << "\n--------------------------------------------" << endl;
 }
 
-void queue::destroy()
+void Antrian::destroy()
 {
     while (!isEmpty())
     {
@@ -81,7 +75,7 @@ void queue::destroy()
     }
 }
 
-queue::~queue()
+Antrian::~Antrian()
 {
     destroy();
     delete list;

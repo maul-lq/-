@@ -2,29 +2,34 @@
 #include <queue>
 #include <vector>
 #include <climits>
-#include <fstream> // Untuk ekspor ke file
-#include "doublelinkedlist.cpp" // Include the DoubleLinkedList class
+#include <fstream>              // Untuk ekspor ke file
+#include "doublelinkedlist.h" // Include the DoubleLinkedList class
 using namespace std;
 
-struct Simpul {
+struct Simpul
+{
     int info;
     Simpul *left, *right;
 };
 
-class Graf {
+class Graf
+{
 private:
     Simpul *first, *last;
-    DoubleLinkedList adjacencyLists[5]; // Replace adjacency matrix with DoubleLinkedList
+    static const int NODE_COUNT = 6;
+    DoubleLinkedList adjacencyLists[NODE_COUNT]; // Replace adjacency matrix with DoubleLinkedList
 
 public:
-    Graf(int matrix[5][5], int nodes[5]) {
+    Graf(int matrix[NODE_COUNT][NODE_COUNT], int nodes[NODE_COUNT])
+    {
         // Inisialisasi simpul
         InisialisasiSimpul(nodes);
         // Buat hubungan antar simpul
         BuatHubungan(matrix);
     }
 
-    void InisialisasiSimpul(int nodes[5]) {
+    void InisialisasiSimpul(int nodes[NODE_COUNT])
+    {
         Simpul *P;
         first = last = nullptr;
 
@@ -35,7 +40,8 @@ public:
         P->left = P->right = nullptr;
 
         // Buat simpul berikutnya
-        for (int i = 1; i < 5; i++) {
+        for (int i = 1; i < NODE_COUNT; i++)
+        {
             P = new Simpul;
             P->info = nodes[i];
             last->left = P;
@@ -44,12 +50,16 @@ public:
         }
     }
 
-    void BuatHubungan(int matrix[5][5]) {
+    void BuatHubungan(int matrix[NODE_COUNT][NODE_COUNT])
+    {
         Simpul *Q = first;
 
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                if (matrix[i][j] != 0) {
+        for (int i = 0; i < NODE_COUNT; i++)
+        {
+            for (int j = 0; j < NODE_COUNT; j++)
+            {
+                if (matrix[i][j] != 0)
+                {
                     adjacencyLists[i].insertAtEnd(to_string(j + 1) + ":" + to_string(matrix[i][j]));
                 }
             }
@@ -57,10 +67,12 @@ public:
         }
     }
 
-    void TampilkanGraf() {
+    void TampilkanGraf()
+    {
         Simpul *Q = first;
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NODE_COUNT; i++)
+        {
             cout << "Vertex " << Q->info << endl;
             cout << "  Berhubungan dengan: ";
             adjacencyLists[i].displayList();
@@ -69,31 +81,36 @@ public:
     }
 
     // Fungsi Dijkstra untuk mencari jarak terpendek
-    void Dijkstra(int start) {
+    void Dijkstra(int start)
+    {
         // Array untuk menyimpan jarak minimum dari simpul awal
-        vector<int> dist(5, INT_MAX);
+        vector<int> dist(NODE_COUNT, INT_MAX);
         dist[start - 1] = 0;
 
-        // Priority queue untuk memilih simpul dengan jarak minimum
+        // Priority Antrian untuk memilih simpul dengan jarak minimum
         priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
         pq.push({0, start - 1}); // {jarak, simpul}
 
-        while (!pq.empty()) {
+        while (!pq.empty())
+        {
             int currentDist = pq.top().first;
             int currentNode = pq.top().second;
             pq.pop();
 
             // Jika jarak saat ini lebih besar dari jarak yang sudah diketahui, lewati
-            if (currentDist > dist[currentNode]) continue;
+            if (currentDist > dist[currentNode])
+                continue;
 
             // Iterasi melalui tetangga simpul saat ini
             auto node = adjacencyLists[currentNode].getHead()->next; // Pastikan mulai dari node pertama
-            while (node != nullptr) {
+            while (node != nullptr)
+            {
                 const string &neighbor = node->data;
 
                 // Validasi format data "simpul:bobot"
                 size_t colonPos = neighbor.find(':');
-                if (colonPos == string::npos) {
+                if (colonPos == string::npos)
+                {
                     cerr << "Format data tidak valid: " << neighbor << endl;
                     node = node->next;
                     continue;
@@ -104,7 +121,8 @@ public:
                 int weight = stoi(neighbor.substr(colonPos + 1));
 
                 // Relaksasi jarak
-                if (dist[currentNode] + weight < dist[neighborNode]) {
+                if (dist[currentNode] + weight < dist[neighborNode])
+                {
                     dist[neighborNode] = dist[currentNode] + weight;
                     pq.push({dist[neighborNode], neighborNode});
                 }
@@ -114,7 +132,8 @@ public:
 
         // Tampilkan hasil
         cout << "Jarak terpendek dari simpul " << start << ":\n";
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NODE_COUNT; i++)
+        {
             cout << "Ke simpul " << (i + 1) << ": " << (dist[i] == INT_MAX ? -1 : dist[i]) << endl;
         }
 
@@ -122,15 +141,18 @@ public:
         EksporHasil(dist, start);
     }
 
-    void EksporHasil(const vector<int>& dist, int start) {
+    void EksporHasil(const vector<int> &dist, int start)
+    {
         ofstream file("hasil_dijkstra.csv");
-        if (!file.is_open()) {
+        if (!file.is_open())
+        {
             cerr << "Gagal membuka file untuk ekspor!" << endl;
             return;
         }
 
         file << "Simpul Awal,Jarak Ke,Simpul Tujuan\n";
-        for (int i = 0; i < dist.size(); i++) {
+        for (int i = 0; i < dist.size(); i++)
+        {
             file << start << "," << (dist[i] == INT_MAX ? -1 : dist[i]) << "," << (i + 1) << "\n";
         }
 
@@ -138,10 +160,12 @@ public:
         cout << "Hasil diekspor ke 'hasil_dijkstra.csv'" << endl;
     }
 
-    ~Graf() {
+    ~Graf()
+    {
         // Hapus semua simpul
         Simpul *current = first, *next;
-        while (current != nullptr) {
+        while (current != nullptr)
+        {
             next = current->left;
             delete current;
             current = next;
@@ -149,37 +173,44 @@ public:
     }
 };
 
-int main() {
-    try {
-        system("cls");
+// int main()
+// {
+//     try
+//     {
+//         system("cls");
 
-        // Adjacency matrix dan nomor simpul
-        int A[5][5] = {
-            {0, 5, 0, 2, 0},
-            {6, 0, 3, 0, 0},
-            {0, 0, 0, 0, 9},
-            {0, 0, 12, 0, 7},
-            {0, 14, 0, 0, 0}};
-        int NoSimpul[5] = {1, 2, 3, 4, 5};
+//         // Adjacency matrix dan nomor simpul
+//         int A[6][6] = {
+//             {0, 5, 0, 2, 0, 0},
+//             {6, 0, 3, 0, 0, 0},
+//             {0, 0, 0, 0, 9, 0},
+//             {0, 0, 12, 0, 7, 0},
+//             {0, 14, 0, 0, 0, 3},
+//             {0, 1, 0, 3, 0, 0},
+//         };
+//         int NoSimpul[6] = {1, 2, 3, 4, 5, 6};
+//         // Buat dan tampilkan graf
+//         Graf graf(A, NoSimpul);
+//         graf.TampilkanGraf();
 
-        // Buat dan tampilkan graf
-        Graf graf(A, NoSimpul);
-        graf.TampilkanGraf();
+//         // Panggil fungsi Dijkstra
+//         int startSimpul;
+//         cout << "Masukkan simpul awal untuk mencari jarak terpendek (1-6): ";
+//         cin >> startSimpul;
+//         if (startSimpul < 1 || startSimpul > 6)
+//         {
+//             throw runtime_error("Simpul awal harus antara 1 sampai 6.");
+//         }
+//         graf.Dijkstra(startSimpul);
+//         graf.Dijkstra(startSimpul);
 
-        // Panggil fungsi Dijkstra
-        int startSimpul;
-        cout << "Masukkan simpul awal untuk mencari jarak terpendek (1-5): ";
-        cin >> startSimpul;
-        if (startSimpul < 1 || startSimpul > 5) {
-            throw runtime_error("Simpul awal harus antara 1 sampai 5.");
-        }
-        graf.Dijkstra(startSimpul);
-
-        system("pause");
-    } catch (const exception& e) {
-        cerr << "Terjadi kesalahan: " << e.what() << endl;
-        system("pause");
-        return 1;
-    }
-    return 0;
-}
+//         system("pause");
+//     }
+//     catch (const exception &e)
+//     {
+//         cerr << "Terjadi kesalahan: " << e.what() << endl;
+//         system("pause");
+//         return 1;
+//     }
+//     return 0;
+// }

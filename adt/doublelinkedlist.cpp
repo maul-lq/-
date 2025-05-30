@@ -1,6 +1,7 @@
 #include <iostream>
 #include <Windows.h>
 #include <string>
+
 using namespace std;
 
 class DoubleLinkedList
@@ -16,7 +17,6 @@ private:
     DNODE *tail;
 public:
     DoubleLinkedList();
-    ~DoubleLinkedList();
     void insertAtStart(string data);
     void insertAtEnd(string data);
     void insertAfter(string target, string data);
