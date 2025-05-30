@@ -27,6 +27,7 @@ DoubleLinkedList::~DoubleLinkedList()
 
 void DoubleLinkedList::insertAtStart(string data)
 {
+    if (!this) return; // Prevent null dereference
     DNODE *baru = new DNODE;
     baru->data = data;
     baru->prev = head;
@@ -37,6 +38,7 @@ void DoubleLinkedList::insertAtStart(string data)
 
 void DoubleLinkedList::insertAtEnd(string data)
 {
+    if (!this) return; // Prevent null dereference
     DNODE *baru = new DNODE;
     baru->data = data;
     baru->next = tail;
@@ -47,6 +49,7 @@ void DoubleLinkedList::insertAtEnd(string data)
 
 void DoubleLinkedList::insertAfter(string target, string data)
 {
+    if (!this) return; // Prevent null dereference
     DNODE *current = head->next;
     while(current != tail && current->data != target)
     {

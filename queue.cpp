@@ -1,27 +1,36 @@
 #include <iostream>
 #include <string>
 using namespace std;
-#include "doublelinkedlist.h" // Menggunakan file .cpp langsung
+#include "main.h"
+#include "queue.h"
+#include "doublelinkedlist.h"
 
 // Define the Antrian class
-class Antrian {
-private:
-    int maks;
-    int count;
-    DoubleLinkedList* list;
+// class Antrian {
+// private:
+//     int maks;
+//     int count;
+//     DoubleLinkedList* list;
 
-public:
-    Antrian();
-    ~Antrian();
+// public:
+//     Antrian();
+//     ~Antrian();
 
-    bool isFull();
-    bool isEmpty();
-    void enqueue(string data);
-    void dequeue();
-    int HitungAntrian();
-    void Tampil();
-    void destroy();
-};
+//     bool isFull();
+//     bool isEmpty();
+//     void enqueue(string data);
+//     void dequeue();
+//     int HitungAntrian();
+//     void Tampil();
+//     void destroy();
+// };
+
+Antrian::Antrian()
+{
+    maks = 100;
+    count = 0;
+    list = new DoubleLinkedList();
+}
 
 bool Antrian::isFull()
 {

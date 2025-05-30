@@ -9,7 +9,10 @@
                 "/EHsc",
                 "/nologo",
                 "/Fe${fileDirname}\\bin\\${fileBasenameNoExtension}.exe",
-                "${file}"
+                "${file}",
+                "queue.cpp",
+                "doublelinkedlist.cpp",
+                "graph.cpp"
             ],
             "options": {
                 "cwd": "${fileDirname}"

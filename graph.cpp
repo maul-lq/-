@@ -1,177 +1,166 @@
+#include "graph.h"
+#include "doublelinkedlist.h"
 #include <iostream>
 #include <queue>
 #include <vector>
 #include <climits>
-#include <fstream>              // Untuk ekspor ke file
-#include "doublelinkedlist.h" // Include the DoubleLinkedList class
+#include <fstream>
 using namespace std;
 
-struct Simpul
+// Implementasi method-method Graf
+
+Graf::Graf(int matrix[NODE_COUNT][NODE_COUNT], int nodes[NODE_COUNT])
 {
-    int info;
-    Simpul *left, *right;
-};
+    adjacencyLists = new DoubleLinkedList[NODE_COUNT]; // Allocate array
+    // Inisialisasi simpul
+    InisialisasiSimpul(nodes);
+    // Buat hubungan antar simpul
+    BuatHubungan(matrix);
+}
 
-class Graf
+void Graf::InisialisasiSimpul(int nodes[NODE_COUNT])
 {
-private:
-    Simpul *first, *last;
-    static const int NODE_COUNT = 6;
-    DoubleLinkedList adjacencyLists[NODE_COUNT]; // Replace adjacency matrix with DoubleLinkedList
+    Simpul *P;
+    first = last = nullptr;
 
-public:
-    Graf(int matrix[NODE_COUNT][NODE_COUNT], int nodes[NODE_COUNT])
+    // Buat simpul pertama
+    P = new Simpul;
+    P->info = nodes[0];
+    first = last = P;
+    P->left = P->right = nullptr;
+
+    // Buat simpul berikutnya
+    for (int i = 1; i < NODE_COUNT; i++)
     {
-        // Inisialisasi simpul
-        InisialisasiSimpul(nodes);
-        // Buat hubungan antar simpul
-        BuatHubungan(matrix);
-    }
-
-    void InisialisasiSimpul(int nodes[NODE_COUNT])
-    {
-        Simpul *P;
-        first = last = nullptr;
-
-        // Buat simpul pertama
         P = new Simpul;
-        P->info = nodes[0];
-        first = last = P;
+        P->info = nodes[i];
+        last->left = P;
+        last = P;
         P->left = P->right = nullptr;
-
-        // Buat simpul berikutnya
-        for (int i = 1; i < NODE_COUNT; i++)
-        {
-            P = new Simpul;
-            P->info = nodes[i];
-            last->left = P;
-            last = P;
-            P->left = P->right = nullptr;
-        }
     }
+}
 
-    void BuatHubungan(int matrix[NODE_COUNT][NODE_COUNT])
+void Graf::BuatHubungan(int matrix[NODE_COUNT][NODE_COUNT])
+{
+    Simpul *Q = first;
+
+    for (int i = 0; i < NODE_COUNT; i++)
     {
-        Simpul *Q = first;
-
-        for (int i = 0; i < NODE_COUNT; i++)
+        for (int j = 0; j < NODE_COUNT; j++)
         {
-            for (int j = 0; j < NODE_COUNT; j++)
+            if (matrix[i][j] != 0)
             {
-                if (matrix[i][j] != 0)
-                {
-                    adjacencyLists[i].insertAtEnd(to_string(j + 1) + ":" + to_string(matrix[i][j]));
-                }
+                adjacencyLists[i].insertAtEnd(to_string(j + 1) + ":" + to_string(matrix[i][j]));
             }
-            Q = Q->left;
         }
+        Q = Q->left;
     }
+}
 
-    void TampilkanGraf()
+void Graf::TampilkanGraf()
+{
+    Simpul *Q = first;
+
+    for (int i = 0; i < NODE_COUNT; i++)
     {
-        Simpul *Q = first;
-
-        for (int i = 0; i < NODE_COUNT; i++)
-        {
-            cout << "Vertex " << Q->info << endl;
-            cout << "  Berhubungan dengan: ";
-            adjacencyLists[i].displayList();
-            Q = Q->left;
-        }
+        cout << "Vertex " << Q->info << endl;
+        cout << "  Berhubungan dengan: ";
+        adjacencyLists[i].displayList();
+        Q = Q->left;
     }
+}
 
-    // Fungsi Dijkstra untuk mencari jarak terpendek
-    void Dijkstra(int start)
+void Graf::Dijkstra(int start)
+{
+    // Array untuk menyimpan jarak minimum dari simpul awal
+    vector<int> dist(NODE_COUNT, INT_MAX);
+    dist[start - 1] = 0;
+
+    // Priority Antrian untuk memilih simpul dengan jarak minimum
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    pq.push({0, start - 1}); // {jarak, simpul}
+
+    while (!pq.empty())
     {
-        // Array untuk menyimpan jarak minimum dari simpul awal
-        vector<int> dist(NODE_COUNT, INT_MAX);
-        dist[start - 1] = 0;
+        int currentDist = pq.top().first;
+        int currentNode = pq.top().second;
+        pq.pop();
 
-        // Priority Antrian untuk memilih simpul dengan jarak minimum
-        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-        pq.push({0, start - 1}); // {jarak, simpul}
+        // Jika jarak saat ini lebih besar dari jarak yang sudah diketahui, lewati
+        if (currentDist > dist[currentNode])
+            continue;
 
-        while (!pq.empty())
+        // Iterasi melalui tetangga simpul saat ini
+        auto node = adjacencyLists[currentNode].getHead()->next; // Pastikan mulai dari node pertama
+        while (node != nullptr)
         {
-            int currentDist = pq.top().first;
-            int currentNode = pq.top().second;
-            pq.pop();
+            const string &neighbor = node->data;
 
-            // Jika jarak saat ini lebih besar dari jarak yang sudah diketahui, lewati
-            if (currentDist > dist[currentNode])
-                continue;
-
-            // Iterasi melalui tetangga simpul saat ini
-            auto node = adjacencyLists[currentNode].getHead()->next; // Pastikan mulai dari node pertama
-            while (node != nullptr)
+            // Validasi format data "simpul:bobot"
+            size_t colonPos = neighbor.find(':');
+            if (colonPos == string::npos)
             {
-                const string &neighbor = node->data;
-
-                // Validasi format data "simpul:bobot"
-                size_t colonPos = neighbor.find(':');
-                if (colonPos == string::npos)
-                {
-                    cerr << "Format data tidak valid: " << neighbor << endl;
-                    node = node->next;
-                    continue;
-                }
-
-                // Pisahkan data "simpul:bobot"
-                int neighborNode = stoi(neighbor.substr(0, colonPos)) - 1;
-                int weight = stoi(neighbor.substr(colonPos + 1));
-
-                // Relaksasi jarak
-                if (dist[currentNode] + weight < dist[neighborNode])
-                {
-                    dist[neighborNode] = dist[currentNode] + weight;
-                    pq.push({dist[neighborNode], neighborNode});
-                }
+                cerr << "Format data tidak valid: " << neighbor << endl;
                 node = node->next;
+                continue;
             }
-        }
 
-        // Tampilkan hasil
-        cout << "Jarak terpendek dari simpul " << start << ":\n";
-        for (int i = 0; i < NODE_COUNT; i++)
-        {
-            cout << "Ke simpul " << (i + 1) << ": " << (dist[i] == INT_MAX ? -1 : dist[i]) << endl;
-        }
+            // Pisahkan data "simpul:bobot"
+            int neighborNode = stoi(neighbor.substr(0, colonPos)) - 1;
+            int weight = stoi(neighbor.substr(colonPos + 1));
 
-        // Ekspor hasil ke file
-        EksporHasil(dist, start);
+            // Relaksasi jarak
+            if (dist[currentNode] + weight < dist[neighborNode])
+            {
+                dist[neighborNode] = dist[currentNode] + weight;
+                pq.push({dist[neighborNode], neighborNode});
+            }
+            node = node->next;
+        }
     }
 
-    void EksporHasil(const vector<int> &dist, int start)
+    // Tampilkan hasil
+    cout << "Jarak terpendek dari simpul " << start << ":\n";
+    for (int i = 0; i < NODE_COUNT; i++)
     {
-        ofstream file("hasil_dijkstra.csv");
-        if (!file.is_open())
-        {
-            cerr << "Gagal membuka file untuk ekspor!" << endl;
-            return;
-        }
-
-        file << "Simpul Awal,Jarak Ke,Simpul Tujuan\n";
-        for (int i = 0; i < dist.size(); i++)
-        {
-            file << start << "," << (dist[i] == INT_MAX ? -1 : dist[i]) << "," << (i + 1) << "\n";
-        }
-
-        file.close();
-        cout << "Hasil diekspor ke 'hasil_dijkstra.csv'" << endl;
+        cout << "Ke simpul " << (i + 1) << ": " << (dist[i] == INT_MAX ? -1 : dist[i]) << endl;
     }
 
-    ~Graf()
+    // Ekspor hasil ke file
+    EksporHasil(dist, start);
+}
+
+void Graf::EksporHasil(const std::vector<int> &dist, int start)
+{
+    ofstream file("hasil_dijkstra.csv");
+    if (!file.is_open())
     {
-        // Hapus semua simpul
-        Simpul *current = first, *next;
-        while (current != nullptr)
-        {
-            next = current->left;
-            delete current;
-            current = next;
-        }
+        cerr << "Gagal membuka file untuk ekspor!" << endl;
+        return;
     }
-};
+
+    file << "Simpul Awal,Jarak Ke,Simpul Tujuan\n";
+    for (int i = 0; i < dist.size(); i++)
+    {
+        file << start << "," << (dist[i] == INT_MAX ? -1 : dist[i]) << "," << (i + 1) << "\n";
+    }
+
+    file.close();
+    cout << "Hasil diekspor ke 'hasil_dijkstra.csv'" << endl;
+}
+
+Graf::~Graf()
+{
+    // Hapus semua simpul
+    Simpul *current = first, *next;
+    while (current != nullptr)
+    {
+        next = current->left;
+        delete current;
+        current = next;
+    }
+    delete[] adjacencyLists; // Free adjacencyLists array
+}
 
 // int main()
 // {
@@ -181,12 +170,12 @@ public:
 
 //         // Adjacency matrix dan nomor simpul
 //         int A[6][6] = {
-//             {0, 5, 0, 2, 0, 0},
-//             {6, 0, 3, 0, 0, 0},
-//             {0, 0, 0, 0, 9, 0},
-//             {0, 0, 12, 0, 7, 0},
-//             {0, 14, 0, 0, 0, 3},
-//             {0, 1, 0, 3, 0, 0},
+//             {0, 3, 0, 0, 0, 0},
+//             {0, 0, 0, 0, 0, 6},
+//             {0, 0, 0, 0, 0, 7},
+//             {3, 0, 0, 0, 0, 0},
+//             {3, 0, 0, 0, 0, 0},
+//             {0, 0, 0, 0, 0, 0},
 //         };
 //         int NoSimpul[6] = {1, 2, 3, 4, 5, 6};
 //         // Buat dan tampilkan graf
