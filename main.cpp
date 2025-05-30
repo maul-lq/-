@@ -2,37 +2,26 @@
 #include <string>
 #include <stdio.h>
 #include <map>
-#include <sql.h>
 #include <array>
 #include "main.h"
-// #include "adt/queue.cpp"
-// #include "adt/graph.cpp"
+#include "queue.cpp"
+#include "graph.cpp"
 using namespace std;
+
+void judul()
+{
+    system("cls");
+    printf("Selamat datang di Trans Trash\n");
+    printf("=============================\n");
+}
 
 int main()
 {
     map<string, string> data;
     string userInput;
     bool appIsRun = true;
+    Antrian laporan;
     system("cls");
-
-    // Antrian q;
-
-    // // Define adjacency matrix and node array
-    // int adjacencyMatrix[6][6] = {
-    //     {0, 5, 0, 2, 0, 0},
-    //     {6, 0, 3, 0, 0, 0},
-    //     {0, 0, 0, 0, 9, 0},
-    //     {0, 0, 12, 0, 7, 0},
-    //     {0, 14, 0, 0, 0, 3},
-    //     {0, 1, 0, 3, 0, 0}
-    // };
-    // int nodes[6] = {1, 2, 3, 4, 5, 6};
-
-    // // Pass the arrays to the Graf constructor
-    // Graf graf(adjacencyMatrix, nodes);
-
-    // graf.TampilkanGraf();
 
     array<string, 2> akun = {"root", "admin"};
 
@@ -57,17 +46,30 @@ int main()
             if (data["username"] == akun[0] && data["password"] == akun[1])
             {
                 // masuk menu admin
-                judul();
-                printf("1. Lihat Laporan");
-                printf("2. Keluar");
-                // if (condition)
-                // {
-                //     /* code */
-                // }
-                // else
-                // {
-                //     /* code */
-                // }
+                bool adminMenu = true;
+                while (adminMenu)
+                {
+                    judul();
+                    printf("1. Lihat Laporan\n");
+                    printf("2. Keluar\n");
+                    getline(cin, userInput);
+
+                    if (userInput == "1")
+                    {
+                        judul();
+                        laporan.Tampil();
+                        system("pause");
+                    }
+                    else if (userInput == "2")
+                    {
+                        adminMenu = false;
+                    }
+                    else
+                    {
+                        printf("Pilihan tidak valid!\n");
+                        system("pause");
+                    }
+                }
             }
             else
             {
@@ -75,12 +77,23 @@ int main()
                 system("pause");
             }
         }
-        if (userInput == "2")
+        else if (userInput == "2")
         {
+            judul();
+            printf("Masukkan laporan anda: ");
+            getline(cin, userInput);
+            laporan.enqueue(userInput);
+            printf("Laporan berhasil ditambahkan!\n");
+            system("pause");
         }
-        if (userInput == "3")
+        else if (userInput == "3")
         {
             appIsRun = false;
+        }
+        else
+        {
+            printf("Pilihan tidak valid!\n");
+            system("pause");
         }
     }
 
@@ -88,11 +101,4 @@ int main()
     system("pause");
 
     return 0;
-}
-
-void judul()
-{
-    system("cls");
-    printf("Selamat datang di Trans Trash\n");
-    printf("=============================\n");
 }
