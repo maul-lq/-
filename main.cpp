@@ -94,14 +94,19 @@ int main()
     system("pause");
 }
 
-void tampilanAdmin(string &userInput, Antrian &laporan)
+void tampilanAdmin(string userInput, Antrian &laporan)
 {
-    bool adminMenu = true;
+bool adminMenu = true;
     while (adminMenu)
     {
         judul();
+        printf("Menu Admin Laporan:\n");
         printf("1. Lihat Laporan\n");
-        printf("2. Keluar\n");
+        printf("2. Tambah Laporan\n");
+        printf("3. Edit Laporan\n");
+        printf("4. Hapus Laporan\n");
+        printf("5. Keluar\n");
+        printf("Pilih menu: ");
         getline(cin, userInput);
 
         if (userInput == "1")
@@ -111,6 +116,103 @@ void tampilanAdmin(string &userInput, Antrian &laporan)
             system("pause");
         }
         else if (userInput == "2")
+        {
+            judul();
+            string laporanBaru, temp;
+            printf("Lokasi (Wilayah A-E\t: ");
+            getline(cin, temp);laporanBaru += "Lokasi: " + temp + ", ";
+            printf("Hari\t: ");
+            getline(cin, temp);laporanBaru += "Hari: " + temp + ", ";
+            printf("Berat\t: ");
+            getline(cin, temp);laporanBaru += "Berat: " + temp + ". ";
+            laporan.enqueue(laporanBaru);
+            printf("Laporan berhasil ditambahkan!\n");
+            system("pause");
+        }
+        else if (userInput == "3")
+        {
+            judul();
+            laporan.Tampil();
+            printf("Masukkan nomor laporan yang ingin diedit: ");
+            string idxStr;
+            getline(cin, idxStr);
+            int idx = stoi(idxStr);
+            string laporanBaru, temp;
+            printf("Lokasi\t: ");
+            getline(cin, temp);laporanBaru += "Lokasi: " + temp + ", ";
+            printf("Hari\t: ");
+            getline(cin, temp);laporanBaru += "Hari: " + temp + ", ";
+            printf("Berat\t: ");
+            getline(cin, temp);laporanBaru += "Berat: " + temp + ". ";
+
+            int total = laporan.HitungAntrian();
+            if (idx < 1 || idx > total) {
+                printf("Nomor laporan tidak valid!\n");
+            } else {
+                Antrian temp;
+                // Pindahkan semua sebelum idx ke temp
+                for (int i = 1; i < idx; ++i) {
+                    string data = laporan.depan();
+                    temp.enqueue(data);
+                    laporan.dequeue();
+                }
+                // Hapus laporan lama (pada posisi idx)
+                laporan.dequeue();
+                // Tambahkan laporan baru
+                temp.enqueue(laporanBaru);
+                // Pindahkan sisa laporan
+                int sisa = laporan.HitungAntrian();
+                for (int i = 0; i < sisa; ++i) {
+                    string data = laporan.depan();
+                    temp.enqueue(data);
+                    laporan.dequeue();
+                }
+                // Salin kembali ke laporan utama
+                while (!temp.isEmpty()) {
+                    string data = temp.depan();
+                    laporan.enqueue(data);
+                    temp.dequeue();
+                }
+                printf("Laporan berhasil diedit!\n");
+            }
+            system("pause");
+        }
+        else if (userInput == "4")
+        {
+            judul();
+            laporan.Tampil();
+            printf("Masukkan nomor laporan yang ingin dihapus: ");
+            string idxStr;
+            getline(cin, idxStr);
+            int idx = stoi(idxStr);
+
+            int total = laporan.HitungAntrian();
+            if (idx < 1 || idx > total) {
+                printf("Nomor laporan tidak valid!\n");
+            } else {
+                Antrian temp;
+                for (int i = 1; i < idx; ++i) {
+                    string data = laporan.depan();
+                    temp.enqueue(data);
+                    laporan.dequeue();
+                }
+                laporan.dequeue();
+                int sisa = laporan.HitungAntrian();
+                for (int i = 0; i < sisa; ++i) {
+                    string data = laporan.depan();
+                    temp.enqueue(data);
+                    laporan.dequeue();
+                }
+                while (!temp.isEmpty()) {
+                    string data = temp.depan();
+                    laporan.enqueue(data);
+                    temp.dequeue();
+                }
+                printf("Laporan berhasil dihapus!\n");
+            }
+            system("pause");
+        }
+        else if (userInput == "5")
         {
             adminMenu = false;
         }

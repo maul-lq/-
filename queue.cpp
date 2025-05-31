@@ -89,3 +89,12 @@ Antrian::~Antrian()
     destroy();
     delete list;
 }
+
+string Antrian::depan()
+{
+    if (isEmpty()) {
+        throw runtime_error("Queue kosong!");
+    }
+    // Ambil data node pertama setelah head
+    return list->getHead()->next->data;
+}

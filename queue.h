@@ -22,6 +22,7 @@ public:
     int HitungAntrian();
     void Tampil();
     void destroy();
+    string depan(); // Tambahkan ini
 };
 
 #endif // QUEUE_H
