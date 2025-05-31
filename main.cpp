@@ -7,6 +7,7 @@
 #include "queue.h"
 #include "doublelinkedlist.h"
 #include "graph.h"
+
 using namespace std;
 
 void judul()
@@ -16,129 +17,106 @@ void judul()
     printf("=============================\n");
 }
 
+void tampilkanPesanError()
+{
+    printf("Pilihan tidak valid!\n");
+    system("pause");
+}
+
 int main()
 {
-    // map<string, string> data;
-    // string userInput;
-    // bool appIsRun = true;
-    // Antrian laporan;
-    // system("cls");
+    map<string, string> data;
+    string userInput;
+    bool appIsRun = true;
+    Antrian laporan;
+    system("cls");
 
-    // array<string, 2> akun = {"root", "admin"};
+    // The 'akun' array stores the username and password for admin authentication.
+    array<string, 2> akun = {"root", "admin"};
 
-    // while (appIsRun)
-    // {
-    //     judul();
-    //     printf("1. Masuk (Khusus Admin)\n");
-    //     printf("2. Masuk\n");
-    //     printf("3. Keluar\n");
-    //     getline(cin, userInput);
-    //     data["input"] = userInput;
-
-    //     if (userInput == "1")
-    //     {
-    //         judul();
-    //         printf("Username: ");
-    //         getline(cin, userInput);
-    //         data["username"] = userInput;
-    //         printf("Password: ");
-    //         getline(cin, userInput);
-    //         data["password"] = userInput;
-    //         if (data["username"] == akun[0] && data["password"] == akun[1])
-    //         {
-    //             // masuk menu admin
-    //             bool adminMenu = true;
-    //             while (adminMenu)
-    //             {
-    //                 judul();
-    //                 printf("1. Lihat Laporan\n");
-    //                 printf("2. Keluar\n");
-    //                 getline(cin, userInput);
-
-    //                 if (userInput == "1")
-    //                 {
-    //                     judul();
-    //                     laporan.Tampil();
-    //                     system("pause");
-    //                 }
-    //                 else if (userInput == "2")
-    //                 {
-    //                     adminMenu = false;
-    //                 }
-    //                 else
-    //                 {
-    //                     printf("Pilihan tidak valid!\n");
-    //                     system("pause");
-    //                 }
-    //             }
-    //         }
-    //         else
-    //         {
-    //             printf("Username / password yang anda masukan salah!\n");
-    //             system("pause");
-    //         }
-    //     }
-    //     else if (userInput == "2")
-    //     {
-    //         judul();
-    //         printf("Masukkan laporan anda: ");
-    //         getline(cin, userInput);
-    //         laporan.enqueue(userInput);
-    //         printf("Laporan berhasil ditambahkan!\n");
-    //         system("pause");
-    //     }
-    //     else if (userInput == "3")
-    //     {
-    //         appIsRun = false;
-    //     }
-    //     else
-    //     {
-    //         printf("Pilihan tidak valid!\n");
-    //         system("pause");
-    //     }
-    // }
-
-    // cout << endl;
-    // system("pause");
-
-    // return 0;
-
-    try
+    while (appIsRun)
     {
-        system("cls");
+        judul();
+        printf("1. Masuk (Khusus Admin)\n");
+        printf("2. Masuk\n");
+        printf("3. Keluar\n");
+        getline(cin, userInput);
+        data["input"] = userInput;
 
-        // Adjacency matrix dan nomor simpul
-        int A[6][6] = {
-            {0, 3, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 6},
-            {0, 0, 0, 0, 0, 7},
-            {3, 0, 0, 0, 0, 0},
-            {3, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0},
-        };
-        int NoSimpul[6] = {1, 2, 3, 4, 5, 6};
-        // Buat dan tampilkan graf
-        Graf graf(A, NoSimpul);
-        graf.TampilkanGraf();
-
-        // Panggil fungsi Dijkstra
-        int startSimpul;
-        cout << "Masukkan simpul awal untuk mencari jarak terpendek (1-6): ";
-        cin >> startSimpul;
-        if (startSimpul < 1 || startSimpul > 6)
+        if (userInput == "1")
         {
-            throw runtime_error("Simpul awal harus antara 1 sampai 6.");
+            judul();
+            printf("Username: ");
+            getline(cin, userInput);
+            data["username"] = userInput;
+            printf("Password: ");
+            getline(cin, userInput);
+            data["password"] = userInput;
+            if (data["username"] == akun[0] && data["password"] == akun[1])
+            {
+                tampilanAdmin(userInput, laporan);
+            }
+            else
+            {
+                printf("Username / password yang anda masukan salah!\n");
+                system("pause");
+            }
         }
-        graf.Dijkstra(startSimpul);
-        graf.Dijkstra(startSimpul);
+        else if (userInput == "2")
+        {
+            judul();
+            printf("Masukkan laporan anda: ");
+            getline(cin, userInput);
+            try
+            {
+                laporan.enqueue(userInput);
+                printf("Laporan berhasil ditambahkan!\n");
+            }
+            catch (const exception &e)
+            {
+                printf("Terjadi kesalahan saat menambahkan laporan: %s\n", e.what());
+            }
+            printf("Laporan berhasil ditambahkan!\n");
+            system("pause");
+        }
+        else if (userInput == "3")
+        {
+            appIsRun = false;
+        }
+        else
+        {
+            cout << '\n';
+            system("pause");
+        }
+    }
 
-        system("pause");
-    }
-    catch (const exception &e)
+    cout << endl;
+    system("pause");
+}
+
+void tampilanAdmin(string &userInput, Antrian &laporan)
+{
+    bool adminMenu = true;
+    while (adminMenu)
     {
-        cerr << "Terjadi kesalahan: " << e.what() << endl;
-        system("pause");
-        return 1;
+        judul();
+        printf("1. Lihat Laporan\n");
+        printf("2. Keluar\n");
+        getline(cin, userInput);
+
+        if (userInput == "1")
+        {
+            judul();
+            laporan.Tampil();
+            system("pause");
+        }
+        else if (userInput == "2")
+        {
+            adminMenu = false;
+        }
+        else
+        {
+            tampilkanPesanError();
+        }
     }
-    return 0;
 }

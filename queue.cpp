@@ -71,9 +71,9 @@ int Antrian::HitungAntrian()
 
 void Antrian::Tampil()
 {
-    cout << "Antrian Order" << endl;
+    cout << "Laporan Yang Tersedia" << endl;
     list->displayList();
-    cout << "Jumlah Antrian : " << HitungAntrian() << "\n--------------------------------------------" << endl;
+    cout << "Jumlah Laporan : " << HitungAntrian() << "\n--------------------------------------------" << endl;
 }
 
 void Antrian::destroy()
