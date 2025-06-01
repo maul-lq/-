@@ -166,13 +166,6 @@ int main()
             getline(cin, temp);
             laporanBaru += "Hari: " + temp + ", ";
             
-            // Timestamp otomatis
-            time_t now = time(0);
-            char* dt = ctime(&now);
-            string timestamp(dt);
-            timestamp.pop_back(); // Hapus newline
-            laporanBaru += "Waktu: " + timestamp + ". ";
-            
             try
             {
                 laporan.enqueue(laporanBaru);
