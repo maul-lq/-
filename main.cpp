@@ -9,6 +9,7 @@
 #include "graph.h" // Header kelas Graf
 #include <vector> // Library untuk vector STL
 #include <cctype> // Library untuk fungsi karakter (toupper)
+#include <ctime> // Library untuk fungsi waktu
 
 using namespace std; // Menggunakan namespace std
 
@@ -148,18 +149,33 @@ int main()
         {
             judul();
             string laporanBaru, temp;
+            
             printf("Lokasi (Wilayah A-E)\t: ");
-            getline(cin, temp); // Input lokasi
+            getline(cin, temp);
             laporanBaru += "Lokasi: " + temp + ", ";
+            
+            printf("Jenis Sampah (Organik/Anorganik/B3)\t: ");
+            getline(cin, temp);
+            laporanBaru += "Jenis: " + temp + ", ";
+            
+            printf("Berat (kg)\t: ");
+            getline(cin, temp);
+            laporanBaru += "Berat: " + temp + ", ";
+
             printf("Hari\t: ");
-            getline(cin, temp); // Input hari
+            getline(cin, temp);
             laporanBaru += "Hari: " + temp + ", ";
-            printf("Berat\t: ");
-            getline(cin, temp); // Input berat
-            laporanBaru += "Berat: " + temp + ". ";
+            
+            // Timestamp otomatis
+            time_t now = time(0);
+            char* dt = ctime(&now);
+            string timestamp(dt);
+            timestamp.pop_back(); // Hapus newline
+            laporanBaru += "Waktu: " + timestamp + ". ";
+            
             try
             {
-                laporan.enqueue(laporanBaru); // Masukkan laporan ke antrian
+                laporan.enqueue(laporanBaru);
                 printf("Laporan berhasil ditambahkan!\n");
             }
             catch (const exception &e)
