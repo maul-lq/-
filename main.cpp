@@ -148,7 +148,7 @@ int main()
         {
             judul();
             string laporanBaru, temp;
-            printf("Lokasi\t: ");
+            printf("Lokasi (Wilayah A-E)\t: ");
             getline(cin, temp); // Input lokasi
             laporanBaru += "Lokasi: " + temp + ", ";
             printf("Hari\t: ");
@@ -192,12 +192,11 @@ void tampilanAdmin(string userInput, Antrian &laporan)
         judul(); // Tampilkan judul
         printf("Menu Admin Laporan:\n");
         printf("1. Lihat Laporan\n");
-        printf("2. Tambah Laporan\n");
-        printf("3. Edit Laporan\n");
-        printf("4. Hapus Laporan\n");
-        printf("5. Tanggapi Laporan\n");
-        printf("6. Statistik Mingguan\n"); // Menu statistik
-        printf("7. Keluar\n"); // Menu keluar
+        printf("2. Edit Laporan\n");
+        printf("3. Hapus Laporan\n");
+        printf("4. Tanggapi Laporan\n");
+        printf("5. Statistik Mingguan\n"); // Menu statistik
+        printf("6. Keluar\n"); // Menu keluar
         printf("Pilih menu: ");
         getline(cin, userInput); // Input menu
 
@@ -207,24 +206,7 @@ void tampilanAdmin(string userInput, Antrian &laporan)
             laporan.Tampil(); // Tampilkan semua laporan
             system("pause");
         }
-        else if (userInput == "2") // Tambah laporan
-        {
-            judul();
-            string laporanBaru, temp;
-            printf("Lokasi (Wilayah A-E)\t: ");
-            getline(cin, temp); // Input lokasi
-            laporanBaru += "Lokasi: " + temp + ", ";
-            printf("Hari\t: ");
-            getline(cin, temp); // Input hari
-            laporanBaru += "Hari: " + temp + ", ";
-            printf("Berat\t: ");
-            getline(cin, temp); // Input berat
-            laporanBaru += "Berat: " + temp + ". ";
-            laporan.enqueue(laporanBaru); // Masukkan ke antrian
-            printf("Laporan berhasil ditambahkan!\n");
-            system("pause");
-        }
-        else if (userInput == "3") // Edit laporan
+        else if (userInput == "2") // Edit laporan
         {
             judul();
             laporan.Tampil(); // Tampilkan laporan
@@ -281,7 +263,7 @@ void tampilanAdmin(string userInput, Antrian &laporan)
             }
             system("pause");
         }
-        else if (userInput == "4") // Hapus laporan
+        else if (userInput == "3") // Hapus laporan
         {
             judul();
             laporan.Tampil(); // Tampilkan laporan
@@ -322,7 +304,7 @@ void tampilanAdmin(string userInput, Antrian &laporan)
             }
             system("pause");
         }
-        else if (userInput == "5") // Tanggapi laporan
+        else if (userInput == "4") // Tanggapi laporan
         {
             // Tanggapi laporan: pilih, tampilkan rute terdekat, hapus laporan
             judul();
@@ -416,13 +398,13 @@ void tampilanAdmin(string userInput, Antrian &laporan)
             printf("Laporan telah ditanggapi dan dihapus!\n");
             system("pause");
         }
-        else if (userInput == "6") // Statistik mingguan
+        else if (userInput == "5") // Statistik mingguan
         {
             judul();
             tampilkanStatistikMingguan(laporan); // Tampilkan statistik
             system("pause");
         }
-        else if (userInput == "7") // Keluar menu admin
+        else if (userInput == "6") // Keluar menu admin
         {
             adminMenu = false;
         }
