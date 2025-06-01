@@ -402,7 +402,7 @@ void tampilanAdmin(string userInput, Antrian &laporan)
                 printf("%s", namaLokasi[idx]);
                 if (i != path.size() - 1) printf(" -> ");
             }
-            printf("\nTotal jarak: %d satuan\n", totalDistance);
+            printf("\nTotal jarak: %d Menit\n", totalDistance);
             printf("========================================\n");
             printf("Laporan telah ditanggapi dan dihapus!\n");
             system("pause");
