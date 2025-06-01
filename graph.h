@@ -1,27 +1,28 @@
-#pragma once
-#include <vector> // Add this line
+#pragma once // Cegah duplikasi include
+#include <vector> // Library untuk vector STL
 
-class DoubleLinkedList; // Forward declaration
+class DoubleLinkedList; // Forward declaration DoubleLinkedList
 
-struct Simpul { // Move struct Simpul here, outside the class
-    int info;
-    Simpul *left, *right;
+// Struktur simpul untuk graf
+struct Simpul {
+    int info; // Informasi node (label)
+    Simpul *left, *right; // Pointer ke simpul lain
 };
 
+// Deklarasi kelas Graf
 class Graf {
 private:
-    // Remove struct Simpul definition from here
-    Simpul *first, *last;
-    static const int NODE_COUNT = 6;
-    DoubleLinkedList* adjacencyLists; // or DoubleLinkedList adjacencyLists[NODE_COUNT];
+    Simpul *first, *last; // Pointer ke simpul pertama dan terakhir
+    static const int NODE_COUNT = 6; // Jumlah node tetap
+    DoubleLinkedList* adjacencyLists; // Array pointer adjacency list
 
-    void InisialisasiSimpul(int nodes[NODE_COUNT]);
-    void BuatHubungan(int matrix[NODE_COUNT][NODE_COUNT]);
-    void EksporHasil(const std::vector<int>& dist, int start); // Fix declaration
+    void InisialisasiSimpul(int nodes[NODE_COUNT]); // Inisialisasi simpul
+    void BuatHubungan(int matrix[NODE_COUNT][NODE_COUNT]); // Buat hubungan antar simpul
+    void EksporHasil(const std::vector<int>& dist, int start); // Ekspor hasil dijkstra
 
 public:
-    Graf(int matrix[NODE_COUNT][NODE_COUNT], int nodes[NODE_COUNT]);
-    void TampilkanGraf();
-    void Dijkstra(int start);
-    ~Graf();
+    Graf(int matrix[NODE_COUNT][NODE_COUNT], int nodes[NODE_COUNT]); // Konstruktor
+    void TampilkanGraf(); // Tampilkan graf
+    void Dijkstra(int start, std::vector<int>& path, int& totalDistance); // Algoritma dijkstra dengan rute
+    ~Graf(); // Destruktor
 };

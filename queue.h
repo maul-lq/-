@@ -1,28 +1,29 @@
-#ifndef QUEUE_H
+#ifndef QUEUE_H // Cegah duplikasi include
 #define QUEUE_H
 
-#include <string>
-#include "doublelinkedlist.h"
-using namespace std;
+#include <string> // Library untuk string
+#include "doublelinkedlist.h" // Header DoubleLinkedList
+using namespace std; // Menggunakan namespace std
 
+// Deklarasi kelas Antrian
 class Antrian {
 private:
-    int maks;
-    int count;
-    DoubleLinkedList* list;
+    int maks; // Maksimal jumlah antrian
+    int count; // Jumlah data saat ini
+    DoubleLinkedList* list; // Pointer ke list data
 
 public:
-    Antrian();
-    ~Antrian();
+    Antrian(); // Konstruktor
+    ~Antrian(); // Destruktor
 
-    bool isFull();
-    bool isEmpty();
-    void enqueue(string data);
-    void dequeue();
-    int HitungAntrian();
-    void Tampil();
-    void destroy();
-    string depan(); // Tambahkan ini
+    bool isFull(); // Cek penuh
+    bool isEmpty(); // Cek kosong
+    void enqueue(string data); // Tambah data
+    void dequeue(); // Hapus data depan
+    int HitungAntrian(); // Hitung jumlah data
+    void Tampil(); // Tampilkan semua data
+    void destroy(); // Hapus semua data
+    string depan(); // Ambil data paling depan
 };
 
 #endif // QUEUE_H

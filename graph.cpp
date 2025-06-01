@@ -1,23 +1,23 @@
-#include "graph.h"
-#include "doublelinkedlist.h"
-#include <iostream>
-#include <queue>
-#include <vector>
-#include <climits>
-#include <fstream>
-using namespace std;
+#include "graph.h" // Header kelas Graf
+#include "doublelinkedlist.h" // Header DoubleLinkedList
+#include <iostream> // Library untuk input/output standar
+#include <queue> // Library untuk priority_queue
+#include <vector> // Library untuk vector
+#include <climits> // Library untuk konstanta INT_MAX
+#include <fstream> // Library untuk file output
+using namespace std; // Menggunakan namespace std
 
-// Implementasi method-method Graf
-
+// Konstruktor kelas Graf
 Graf::Graf(int matrix[NODE_COUNT][NODE_COUNT], int nodes[NODE_COUNT])
 {
-    adjacencyLists = new DoubleLinkedList[NODE_COUNT]; // Allocate array
+    adjacencyLists = new DoubleLinkedList[NODE_COUNT]; // Alokasi array adjacency list
     // Inisialisasi simpul
     InisialisasiSimpul(nodes);
     // Buat hubungan antar simpul
     BuatHubungan(matrix);
 }
 
+// Fungsi inisialisasi simpul graf
 void Graf::InisialisasiSimpul(int nodes[NODE_COUNT])
 {
     Simpul *P;
@@ -40,6 +40,7 @@ void Graf::InisialisasiSimpul(int nodes[NODE_COUNT])
     }
 }
 
+// Fungsi membuat hubungan antar simpul berdasarkan matriks adjacency
 void Graf::BuatHubungan(int matrix[NODE_COUNT][NODE_COUNT])
 {
     Simpul *Q = first;
@@ -50,13 +51,14 @@ void Graf::BuatHubungan(int matrix[NODE_COUNT][NODE_COUNT])
         {
             if (matrix[i][j] != 0)
             {
-                adjacencyLists[i].insertAtEnd(to_string(j + 1) + ":" + to_string(matrix[i][j]));
+                adjacencyLists[i].insertAtEnd(to_string(j + 1) + ":" + to_string(matrix[i][j])); // Format "node:bobot"
             }
         }
         Q = Q->left;
     }
 }
 
+// Fungsi menampilkan graf
 void Graf::TampilkanGraf()
 {
     Simpul *Q = first;
@@ -70,20 +72,22 @@ void Graf::TampilkanGraf()
     }
 }
 
-void Graf::Dijkstra(int start)
+// Fungsi algoritma Dijkstra dengan rute dan total jarak
+void Graf::Dijkstra(int start, std::vector<int>& path, int& totalDistance)
 {
     // Array untuk menyimpan jarak minimum dari simpul awal
     vector<int> dist(NODE_COUNT, INT_MAX);
-    dist[start - 1] = 0;
+    vector<int> prev(NODE_COUNT, -1); // Untuk rekonstruksi path
+    dist[start - 1] = 0; // Jarak ke diri sendiri 0
 
-    // Priority Antrian untuk memilih simpul dengan jarak minimum
+    // Priority queue untuk memilih simpul dengan jarak minimum
     priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
     pq.push({0, start - 1}); // {jarak, simpul}
 
     while (!pq.empty())
     {
-        int currentDist = pq.top().first;
-        int currentNode = pq.top().second;
+        int currentDist = pq.top().first; // Jarak saat ini
+        int currentNode = pq.top().second; // Simpul saat ini
         pq.pop();
 
         // Jika jarak saat ini lebih besar dari jarak yang sudah diketahui, lewati
@@ -91,48 +95,58 @@ void Graf::Dijkstra(int start)
             continue;
 
         // Iterasi melalui tetangga simpul saat ini
-        auto node = adjacencyLists[currentNode].getHead()->next; // Pastikan mulai dari node pertama
+        auto node = adjacencyLists[currentNode].getHead()->next; // Mulai dari node pertama
         while (node != nullptr)
         {
-            const string &neighbor = node->data;
+            const string &neighbor = node->data; // Data tetangga
 
             // Validasi format data "simpul:bobot"
             size_t colonPos = neighbor.find(':');
             if (colonPos == string::npos)
             {
-                cerr << "Format data tidak valid: " << neighbor << endl;
+                // cerr << "Format data tidak valid: " << neighbor << endl;
                 node = node->next;
                 continue;
             }
 
             // Pisahkan data "simpul:bobot"
-            int neighborNode = stoi(neighbor.substr(0, colonPos)) - 1;
-            int weight = stoi(neighbor.substr(colonPos + 1));
+            int neighborNode = stoi(neighbor.substr(0, colonPos)) - 1; // Index node tetangga
+            int weight = stoi(neighbor.substr(colonPos + 1)); // Bobot edge
 
             // Relaksasi jarak
             if (dist[currentNode] + weight < dist[neighborNode])
             {
                 dist[neighborNode] = dist[currentNode] + weight;
+                prev[neighborNode] = currentNode;
                 pq.push({dist[neighborNode], neighborNode});
             }
             node = node->next;
         }
     }
 
-    // Tampilkan hasil
-    cout << "Jarak terpendek dari simpul " << start << ":\n";
-    for (int i = 0; i < NODE_COUNT; i++)
-    {
-        cout << "Ke simpul " << (i + 1) << ": " << (dist[i] == INT_MAX ? -1 : dist[i]) << endl;
+    // Cari path ke TPS (node 6, index 5)
+    int target = NODE_COUNT - 1; // TPS ($)
+    path.clear();
+    totalDistance = (dist[target] == INT_MAX ? -1 : dist[target]);
+    if (dist[target] == INT_MAX) {
+        // Tidak ada rute
+        return;
     }
-
-    // Ekspor hasil ke file
-    EksporHasil(dist, start);
+    // Rekonstruksi path mundur
+    vector<int> reversePath;
+    for (int at = target; at != -1; at = prev[at]) {
+        reversePath.push_back(at + 1); // Simpan 1-based
+    }
+    // Balik urutan path
+    for (auto it = reversePath.rbegin(); it != reversePath.rend(); ++it) {
+        path.push_back(*it);
+    }
 }
 
+// Fungsi ekspor hasil dijkstra ke file CSV
 void Graf::EksporHasil(const std::vector<int> &dist, int start)
 {
-    ofstream file("hasil_dijkstra.csv");
+    ofstream file("hasil_dijkstra.csv"); // Buka file output
     if (!file.is_open())
     {
         cerr << "Gagal membuka file untuk ekspor!" << endl;
@@ -149,6 +163,7 @@ void Graf::EksporHasil(const std::vector<int> &dist, int start)
     cout << "Hasil diekspor ke 'hasil_dijkstra.csv'" << endl;
 }
 
+// Destruktor kelas Graf
 Graf::~Graf()
 {
     // Hapus semua simpul
@@ -159,7 +174,7 @@ Graf::~Graf()
         delete current;
         current = next;
     }
-    delete[] adjacencyLists; // Free adjacencyLists array
+    delete[] adjacencyLists; // Hapus array adjacencyLists
 }
 
 // int main()

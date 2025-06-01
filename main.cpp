@@ -1,19 +1,19 @@
-#include <iostream>
-#include <string>
-#include <stdio.h>
-#include <map>
-#include <array>
-#include "main.h"
-#include "queue.h"
-#include "doublelinkedlist.h"
-#include "graph.h"
-#include <vector>
-#include <cctype>
+#include <iostream> // Library untuk input/output standar
+#include <string> // Library untuk tipe data string
+#include <stdio.h> // Library untuk fungsi printf, system, dll
+#include <map> // Library untuk struktur data map
+#include <array> // Library untuk array STL
+#include "main.h" // Header fungsi-fungsi utama
+#include "queue.h" // Header kelas Antrian
+#include "doublelinkedlist.h" // Header kelas DoubleLinkedList
+#include "graph.h" // Header kelas Graf
+#include <vector> // Library untuk vector STL
+#include <cctype> // Library untuk fungsi karakter (toupper)
 
-using namespace std;
+using namespace std; // Menggunakan namespace std
 
 // Matriks graf: A=1, B=2, C=3, D=4, E=5, $=6 (TPS)
-const int NODE_COUNT = 6;
+const int NODE_COUNT = 6; // Jumlah node pada graf
 int adjacencyMatrix[NODE_COUNT][NODE_COUNT] = {
     // A  B  C  D  E  $
     {0, 3, 0, 0, 0, 0}, // A
@@ -23,66 +23,120 @@ int adjacencyMatrix[NODE_COUNT][NODE_COUNT] = {
     {3, 0, 0, 0, 0, 0}, // E
     {0, 0, 0, 0, 0, 0}  // $
 };
-int nodeLabels[NODE_COUNT] = {1, 2, 3, 4, 5, 6}; // 1:A, 2:B, 3:C, 4:D, 5:E, 6:$
+int nodeLabels[NODE_COUNT] = {1, 2, 3, 4, 5, 6}; // Label node: 1:A, 2:B, 3:C, 4:D, 5:E, 6:$
 
 // Helper: konversi lokasi string ke index graf
 int lokasiKeIdx(const std::string &lokasi)
 {
-    if (lokasi.empty())
+    if (lokasi.empty()) // Jika string kosong, return -1
         return -1;
-    char c = std::toupper(lokasi[0]);
+    char c = std::toupper(lokasi[0]); // Ambil karakter pertama dan ubah ke huruf besar
     if (c >= 'A' && c <= 'E')
-        return c - 'A'; // 0-4
+        return c - 'A'; // Konversi A-E ke 0-4
     if (c == '$')
-        return 5;
-    return -1;
+        return 5; // $ ke index 5
+    return -1; // Jika tidak valid, return -1
 }
 
+// Fungsi untuk menampilkan judul aplikasi
 void judul()
 {
-    system("cls");
+    system("cls"); // Bersihkan layar
     printf("Selamat datang di Trans Trash\n");
     printf("=============================\n");
 }
 
+// Fungsi untuk menampilkan pesan error pilihan tidak valid
 void tampilkanPesanError()
 {
     printf("Pilihan tidak valid!\n");
     system("pause");
 }
 
+// Fungsi untuk menampilkan statistik mingguan berat sampah
+void tampilkanStatistikMingguan(Antrian &laporan)
+{
+    // Statistik berat sampah per hari
+    map<string, double> statistik; // Map hari ke total berat
+    vector<string> hariList = {"Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"}; // Daftar hari
+
+    // Ambil semua laporan tanpa mengubah antrian
+    vector<string> semuaLaporan; // Vector untuk menampung semua laporan
+    int n = laporan.HitungAntrian(); // Hitung jumlah laporan
+    for (int i = 0; i < n; ++i) {
+        string data = laporan.depan(); // Ambil data paling depan
+        semuaLaporan.push_back(data); // Simpan ke vector
+        laporan.enqueue(data); // Masukkan kembali ke antrian
+        laporan.dequeue(); // Keluarkan dari depan (rotasi)
+    }
+
+    // Proses laporan: ambil hari dan berat
+    for (const string &lap : semuaLaporan) {
+        size_t h = lap.find("Hari: "); // Cari posisi substring "Hari: "
+        size_t b = lap.find("Berat: "); // Cari posisi substring "Berat: "
+        if (h == string::npos || b == string::npos) continue; // Jika tidak ditemukan, lanjut
+
+        string hari, beratStr;
+        // Ambil hari
+        size_t h1 = h + 6; // Posisi awal nama hari
+        size_t h2 = lap.find(',', h1); // Posisi koma setelah hari
+        hari = lap.substr(h1, h2 - h1); // Ambil substring hari
+
+        // Ambil berat
+        size_t b1 = b + 7; // Posisi awal angka berat
+        size_t b2 = lap.find('.', b1); // Posisi titik setelah berat
+        beratStr = lap.substr(b1, b2 - b1); // Ambil substring berat
+
+        double berat = 0;
+        try { berat = stod(beratStr); } catch (...) { berat = 0; } // Konversi string ke double
+        statistik[hari] += berat; // Tambahkan ke statistik hari terkait
+    }
+
+    // Tampilkan statistik
+    double total = 0; // Total berat semua hari
+    printf("Statistik Mingguan Berat Sampah (kg):\n");
+    for (const string &hari : hariList) {
+        printf("%-8s : %.2f\n", hari.c_str(), statistik[hari]); // Tampilkan berat per hari
+        total += statistik[hari]; // Tambahkan ke total
+    }
+    printf("-----------------------------\n");
+    printf("Total    : %.2f\n", total); // Tampilkan total
+    printf("-----------------------------\n");
+}
+
+// Fungsi utama program
 int main()
 {
-    map<string, string> data;
-    string userInput;
-    bool appIsRun = true;
-    Antrian laporan;
-    system("cls");
+    map<string, string> data; // Map untuk menyimpan input user
+    string userInput; // Variabel input user
+    bool appIsRun = true; // Status aplikasi berjalan
+    Antrian laporan; // Objek antrian laporan
+    system("cls"); // Bersihkan layar
 
-    // The 'akun' array stores the username and password for admin authentication.
-    array<string, 2> akun = {"root", "admin"};
+    // Array akun untuk autentikasi admin
+    array<string, 2> akun = {"root", "admin"}; // Username dan password admin
 
-    while (appIsRun)
+    while (appIsRun) // Loop utama aplikasi
     {
-        judul();
+        judul(); // Tampilkan judul
         printf("1. Masuk (Khusus Admin)\n");
         printf("2. Masuk\n");
         printf("3. Keluar\n");
-        getline(cin, userInput);
-        data["input"] = userInput;
+        getline(cin, userInput); // Ambil input menu
+        data["input"] = userInput; // Simpan input
 
-        if (userInput == "1")
+        if (userInput == "1") // Jika pilih admin
         {
             judul();
             printf("Username: ");
-            getline(cin, userInput);
+            getline(cin, userInput); // Input username
             data["username"] = userInput;
             printf("Password: ");
-            getline(cin, userInput);
+            getline(cin, userInput); // Input password
             data["password"] = userInput;
-            if (data["username"] == akun[0] && data["password"] == akun[1])
+            if (data["username"] == akun[0] && data["password"] == akun[1]) // Cek autentikasi
             {
-                tampilanAdmin(userInput, laporan);
+                tampilanAdmin(userInput, laporan); // Masuk menu admin
             }
             else
             {
@@ -90,22 +144,22 @@ int main()
                 system("pause");
             }
         }
-        else if (userInput == "2")
+        else if (userInput == "2") // Jika pilih user biasa
         {
             judul();
             string laporanBaru, temp;
             printf("Lokasi\t: ");
-            getline(cin, temp);
+            getline(cin, temp); // Input lokasi
             laporanBaru += "Lokasi: " + temp + ", ";
             printf("Hari\t: ");
-            getline(cin, temp);
+            getline(cin, temp); // Input hari
             laporanBaru += "Hari: " + temp + ", ";
             printf("Berat\t: ");
-            getline(cin, temp);
+            getline(cin, temp); // Input berat
             laporanBaru += "Berat: " + temp + ". ";
             try
             {
-                laporan.enqueue(laporanBaru);
+                laporan.enqueue(laporanBaru); // Masukkan laporan ke antrian
                 printf("Laporan berhasil ditambahkan!\n");
             }
             catch (const exception &e)
@@ -114,9 +168,9 @@ int main()
             }
             system("pause");
         }
-        else if (userInput == "3")
+        else if (userInput == "3") // Jika pilih keluar
         {
-            appIsRun = false;
+            appIsRun = false; // Set aplikasi berhenti
         }
         else
         {
@@ -129,65 +183,67 @@ int main()
     system("pause");
 }
 
+// Fungsi tampilan menu admin
 void tampilanAdmin(string userInput, Antrian &laporan)
 {
-    bool adminMenu = true;
+    bool adminMenu = true; // Status menu admin
     while (adminMenu)
     {
-        judul();
+        judul(); // Tampilkan judul
         printf("Menu Admin Laporan:\n");
         printf("1. Lihat Laporan\n");
         printf("2. Tambah Laporan\n");
         printf("3. Edit Laporan\n");
         printf("4. Hapus Laporan\n");
         printf("5. Tanggapi Laporan\n");
-        printf("6. Keluar\n");
+        printf("6. Statistik Mingguan\n"); // Menu statistik
+        printf("7. Keluar\n"); // Menu keluar
         printf("Pilih menu: ");
-        getline(cin, userInput);
+        getline(cin, userInput); // Input menu
 
-        if (userInput == "1")
+        if (userInput == "1") // Lihat laporan
         {
             judul();
-            laporan.Tampil();
+            laporan.Tampil(); // Tampilkan semua laporan
             system("pause");
         }
-        else if (userInput == "2")
+        else if (userInput == "2") // Tambah laporan
         {
             judul();
             string laporanBaru, temp;
-            printf("Lokasi (Wilayah A-E\t: ");
-            getline(cin, temp);
+            printf("Lokasi (Wilayah A-E)\t: ");
+            getline(cin, temp); // Input lokasi
             laporanBaru += "Lokasi: " + temp + ", ";
             printf("Hari\t: ");
-            getline(cin, temp);
+            getline(cin, temp); // Input hari
             laporanBaru += "Hari: " + temp + ", ";
             printf("Berat\t: ");
-            getline(cin, temp);
+            getline(cin, temp); // Input berat
             laporanBaru += "Berat: " + temp + ". ";
-            laporan.enqueue(laporanBaru);
+            laporan.enqueue(laporanBaru); // Masukkan ke antrian
             printf("Laporan berhasil ditambahkan!\n");
             system("pause");
         }
-        else if (userInput == "3")
+        else if (userInput == "3") // Edit laporan
         {
             judul();
-            laporan.Tampil();
+            laporan.Tampil(); // Tampilkan laporan
             printf("Masukkan nomor laporan yang ingin diedit: ");
             string idxStr;
-            getline(cin, idxStr);
-            int idx = stoi(idxStr);
+            getline(cin, idxStr); // Input nomor laporan
+            int idx = stoi(idxStr); // Konversi ke int
             string laporanBaru, temp;
             printf("Lokasi\t: ");
-            getline(cin, temp);
+            getline(cin, temp); // Input lokasi baru
             laporanBaru += "Lokasi: " + temp + ", ";
             printf("Hari\t: ");
-            getline(cin, temp);
+            getline(cin, temp); // Input hari baru
             laporanBaru += "Hari: " + temp + ", ";
             printf("Berat\t: ");
-            getline(cin, temp);
+            getline(cin, temp); // Input berat baru
             laporanBaru += "Berat: " + temp + ". ";
 
-            int total = laporan.HitungAntrian();
+            int total = laporan.HitungAntrian(); // Hitung total laporan
             if (idx < 1 || idx > total)
             {
                 printf("Nomor laporan tidak valid!\n");
@@ -225,13 +281,13 @@ void tampilanAdmin(string userInput, Antrian &laporan)
             }
             system("pause");
         }
-        else if (userInput == "4")
+        else if (userInput == "4") // Hapus laporan
         {
             judul();
-            laporan.Tampil();
+            laporan.Tampil(); // Tampilkan laporan
             printf("Masukkan nomor laporan yang ingin dihapus: ");
             string idxStr;
-            getline(cin, idxStr);
+            getline(cin, idxStr); // Input nomor laporan
             int idx = stoi(idxStr);
 
             int total = laporan.HitungAntrian();
@@ -266,14 +322,14 @@ void tampilanAdmin(string userInput, Antrian &laporan)
             }
             system("pause");
         }
-        else if (userInput == "5")
+        else if (userInput == "5") // Tanggapi laporan
         {
             // Tanggapi laporan: pilih, tampilkan rute terdekat, hapus laporan
             judul();
-            laporan.Tampil();
+            laporan.Tampil(); // Tampilkan laporan
             printf("Masukkan nomor laporan yang ingin ditanggapi: ");
             string idxStr;
-            getline(cin, idxStr);
+            getline(cin, idxStr); // Input nomor laporan
             int idx = stoi(idxStr);
 
             int total = laporan.HitungAntrian();
@@ -317,7 +373,10 @@ void tampilanAdmin(string userInput, Antrian &laporan)
                 size_t end = laporanDipilih.find(',', start);
                 lokasi = laporanDipilih.substr(start, end - start);
             }
-            printf("Laporan dipilih: %s\n", laporanDipilih.c_str());
+            printf("========================================\n");
+            printf("Detail Laporan:\n");
+            printf("  %s\n", laporanDipilih.c_str());
+            printf("========================================\n");
             printf("Lokasi awal laporan: %s\n", lokasi.c_str());
 
             // Admin bisa pilih titik awal (A-E), default dari laporan
@@ -338,11 +397,32 @@ void tampilanAdmin(string userInput, Antrian &laporan)
             Graf graf(adjacencyMatrix, nodeLabels);
             judul();
             printf("Menampilkan rute terdekat dari %c ke TPS ($):\n", 'A' + idxAwal);
-            graf.Dijkstra(idxAwal + 1); // +1 karena nodeLabels 1-based
+
+            // Tampilkan rute terpendek dengan detail lokasi dan jarak
+            std::vector<int> path;
+            int totalDistance = 0;
+            graf.Dijkstra(idxAwal + 1, path, totalDistance); // +1 karena nodeLabels 1-based
+
+            // Tampilkan rute secara menarik
+            printf("Rute terpendek:\n  ");
+            const char* namaLokasi[] = {"A", "B", "C", "D", "E", "TPS"};
+            for (size_t i = 0; i < path.size(); ++i) {
+                int idx = path[i] - 1;
+                printf("%s", namaLokasi[idx]);
+                if (i != path.size() - 1) printf(" -> ");
+            }
+            printf("\nTotal jarak: %d satuan\n", totalDistance);
+            printf("========================================\n");
             printf("Laporan telah ditanggapi dan dihapus!\n");
             system("pause");
         }
-        else if (userInput == "6")
+        else if (userInput == "6") // Statistik mingguan
+        {
+            judul();
+            tampilkanStatistikMingguan(laporan); // Tampilkan statistik
+            system("pause");
+        }
+        else if (userInput == "7") // Keluar menu admin
         {
             adminMenu = false;
         }

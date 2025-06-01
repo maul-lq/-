@@ -1,11 +1,12 @@
-#pragma once
+#pragma once // Cegah duplikasi include
 
-#include <string>
-using std::string;
+#include <string> // Library untuk string
+using std::string; // Menggunakan string dari std
 
-// Forward declaration of Antrian if the full definition is not needed here
-class Antrian;
+// Forward declaration of Antrian jika definisi penuh tidak dibutuhkan di sini
+class Antrian; // Deklarasi kelas Antrian
 
-void judul();
+void judul(); // Deklarasi fungsi judul
 
-void tampilanAdmin(string userInput, Antrian &laporan);
+void tampilanAdmin(string userInput, Antrian &laporan); // Deklarasi fungsi menu admin
+void tampilkanStatistikMingguan(Antrian &laporan); // Deklarasi fungsi statistik mingguan
