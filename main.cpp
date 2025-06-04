@@ -364,47 +364,67 @@ void tampilanAdmin(string userInput, Antrian &laporan)
                 size_t end = laporanDipilih.find(',', start);
                 lokasi = laporanDipilih.substr(start, end - start);
             }
+            
             printf("========================================\n");
             printf("Detail Laporan:\n");
             printf("  %s\n", laporanDipilih.c_str());
             printf("========================================\n");
-            printf("Lokasi awal laporan: %s\n", lokasi.c_str());
+            printf("Lokasi laporan: %s\n", lokasi.c_str());
 
-            // Admin bisa pilih titik awal (A-E), default dari laporan
-            printf("Masukkan titik awal (A-E, default %s): ", lokasi.c_str());
-            string titikAwal;
-            getline(cin, titikAwal);
-            if (titikAwal.empty())
-                titikAwal = lokasi;
-            int idxAwal = lokasiKeIdx(titikAwal);
-            if (idxAwal < 0 || idxAwal > 4)
+            int idxTarget = lokasiKeIdx(lokasi);
+            if (idxTarget < 0 || idxTarget > 4)
             {
-                printf("Titik awal tidak valid! (A-E)\n");
+                printf("Lokasi laporan tidak valid! (A-E)\n");
                 system("pause");
                 continue;
             }
 
-            // Buat graf dan tampilkan rute terpendek ke TPS ($)
+            // Buat graf dan hitung rute round-trip TPS -> Target -> TPS
             Graf graf(adjacencyMatrix, nodeLabels);
             judul();
-            printf("Menampilkan rute terdekat dari %c ke TPS ($):\n", 'A' + idxAwal);
-
-            // Tampilkan rute terpendek dengan detail lokasi dan jarak
-            std::vector<int> path;
-            int totalDistance = 0;
-            graf.Dijkstra(idxAwal + 1, path, totalDistance); // +1 karena nodeLabels 1-based
-
-            // Tampilkan rute secara menarik
-            printf("Rute terpendek:\n  ");
-            const char* namaLokasi[] = {"A", "B", "C", "D", "E", "TPS"};
-            for (size_t i = 0; i < path.size(); ++i) {
-                int idx = path[i] - 1;
-                printf("%s", namaLokasi[idx]);
-                if (i != path.size() - 1) printf(" -> ");
-            }
-            printf("\nTotal jarak: %d Menit\n", totalDistance);
+            
             printf("========================================\n");
+            printf("SIMULASI PENGAMBILAN SAMPAH\n");
+            printf("========================================\n");
+            printf("Lokasi Target: %s\n", lokasi.c_str());
+            printf("Rute: TPS -> %s -> TPS\n", lokasi.c_str());
+            printf("========================================\n");
+
+            std::vector<int> pathToTarget, pathFromTarget;
+            int totalDistance = 0;
+            graf.DijkstraRoundTrip(idxTarget + 1, pathToTarget, pathFromTarget, totalDistance);
+
+            if (totalDistance == -1) {
+                printf("Tidak ada rute yang tersedia ke lokasi %s!\n", lokasi.c_str());
+                system("pause");
+                continue;
+            }
+
+            // Tampilkan rute ke target
+            const char* namaLokasi[] = {"A", "B", "C", "D", "E", "TPS"};
+            printf("Rute Pergi (TPS -> %s):\n  ", lokasi.c_str());
+            for (size_t i = 0; i < pathToTarget.size(); ++i) {
+                int idx = pathToTarget[i] - 1;
+                printf("%s", namaLokasi[idx]);
+                if (i != pathToTarget.size() - 1) printf(" -> ");
+            }
+            printf("\n");
+
+            // Tampilkan rute kembali
+            printf("Rute Kembali (%s -> TPS):\n  ", lokasi.c_str());
+            for (size_t i = 0; i < pathFromTarget.size(); ++i) {
+                int idx = pathFromTarget[i] - 1;
+                printf("%s", namaLokasi[idx]);
+                if (i != pathFromTarget.size() - 1) printf(" -> ");
+            }
+            printf("\n");
+            
+            printf("========================================\n");
+            printf("Total Waktu Pengambilan: %d Menit\n", totalDistance);
+            printf("========================================\n");
+            printf("Status: Sampah berhasil diambil!\n");
             printf("Laporan telah ditanggapi dan dihapus!\n");
+            printf("========================================\n");
             system("pause");
         }
         else if (userInput == "5") // Statistik mingguan
