@@ -17,12 +17,12 @@ using namespace std; // Menggunakan namespace std
 const int NODE_COUNT = 6; // Jumlah node pada graf
 int adjacencyMatrix[NODE_COUNT][NODE_COUNT] = {
     // A  B  C  D  E  $
-    {0, 3, 0, 0, 0, 0}, // A
-    {0, 0, 0, 0, 0, 6}, // B
+    {0, 3, 0, 3, 3, 0}, // A
+    {3, 0, 0, 0, 0, 6}, // B
     {0, 0, 0, 0, 0, 7}, // C
     {3, 0, 0, 0, 0, 0}, // D
     {3, 0, 0, 0, 0, 0}, // E
-    {0, 0, 0, 0, 0, 0}  // $
+    {0, 6, 7, 0, 0, 0}  // $
 };
 int nodeLabels[NODE_COUNT] = {1, 2, 3, 4, 5, 6}; // Label node: 1:A, 2:B, 3:C, 4:D, 5:E, 6:$
 

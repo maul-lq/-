@@ -3,12 +3,12 @@ import matplotlib.pyplot as plt
 
 # Definisikan adjacency matrix
 adjacency_matrix = [
-    [0, 3, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 6],
+    [0, 3, 0, 3, 3, 0],
+    [3, 0, 0, 0, 0, 6],
     [0, 0, 0, 0, 0, 7],
     [3, 0, 0, 0, 0, 0],
     [3, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
+    [0, 6, 7, 0, 0, 0],
 ]
 
 # Buat graf menggunakan NetworkX
@@ -21,7 +21,7 @@ for i in range(len(adjacency_matrix)):
             G.add_edge(i + 1, j + 1, weight=adjacency_matrix[i][j])
 
 # Atur posisi dengan spring_layout (sesuaikan parameter agar tampilan tidak terlalu berdesakan)
-pos = nx.spring_layout(G, k=10, seed=42)
+pos = nx.spring_layout(G, k=4, seed=42)
 
 # Gambarkan graf
 plt.figure(figsize=(5, 5))

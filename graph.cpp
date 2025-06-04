@@ -72,60 +72,56 @@ void Graf::TampilkanGraf()
     }
 }
 
-// Fungsi algoritma Dijkstra dengan rute dan total jarak
+// Fungsi algoritma Dijkstra dengan rute dan total jarak (versi sederhana)
 void Graf::Dijkstra(int start, std::vector<int>& path, int& totalDistance)
 {
-    // Array untuk menyimpan jarak minimum dari simpul awal
-    vector<int> dist(NODE_COUNT, INT_MAX);
-    vector<int> prev(NODE_COUNT, -1); // Untuk rekonstruksi path
-    dist[start - 1] = 0; // Jarak ke diri sendiri 0
+    int dist[NODE_COUNT];
+    int prev[NODE_COUNT];
+    bool visited[NODE_COUNT];
 
-    // Priority queue untuk memilih simpul dengan jarak minimum
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    pq.push({0, start - 1}); // {jarak, simpul}
+    // Inisialisasi
+    for (int i = 0; i < NODE_COUNT; i++) {
+        dist[i] = INT_MAX;
+        prev[i] = -1;
+        visited[i] = false;
+    }
+    dist[start - 1] = 0;
 
-    while (!pq.empty())
-    {
-        int currentDist = pq.top().first; // Jarak saat ini
-        int currentNode = pq.top().second; // Simpul saat ini
-        pq.pop();
+    for (int count = 0; count < NODE_COUNT - 1; count++) {
+        // Cari node dengan jarak minimum yang belum dikunjungi
+        int minDist = INT_MAX, minIndex = -1;
+        for (int v = 0; v < NODE_COUNT; v++) {
+            if (!visited[v] && dist[v] <= minDist) {
+                minDist = dist[v];
+                minIndex = v;
+            }
+        }
 
-        // Jika jarak saat ini lebih besar dari jarak yang sudah diketahui, lewati
-        if (currentDist > dist[currentNode])
-            continue;
+        if (minIndex == -1) break; // Tidak ada node yang bisa diproses
 
-        // Iterasi melalui tetangga simpul saat ini
-        auto node = adjacencyLists[currentNode].getHead()->next; // Mulai dari node pertama
-        while (node != nullptr)
-        {
-            const string &neighbor = node->data; // Data tetangga
+        visited[minIndex] = true;
 
-            // Validasi format data "simpul:bobot"
+        // Update jarak ke tetangga
+        auto node = adjacencyLists[minIndex].getHead()->next;
+        while (node != nullptr) {
+            const std::string& neighbor = node->data;
             size_t colonPos = neighbor.find(':');
-            if (colonPos == string::npos)
-            {
-                // cerr << "Format data tidak valid: " << neighbor << endl;
+            if (colonPos == std::string::npos) {
                 node = node->next;
                 continue;
             }
-
-            // Pisahkan data "simpul:bobot"
-            int neighborNode = stoi(neighbor.substr(0, colonPos)) - 1; // Index node tetangga
-            int weight = stoi(neighbor.substr(colonPos + 1)); // Bobot edge
-
-            // Relaksasi jarak
-            if (dist[currentNode] + weight < dist[neighborNode])
-            {
-                dist[neighborNode] = dist[currentNode] + weight;
-                prev[neighborNode] = currentNode;
-                pq.push({dist[neighborNode], neighborNode});
+            int neighborNode = std::stoi(neighbor.substr(0, colonPos)) - 1;
+            int weight = std::stoi(neighbor.substr(colonPos + 1));
+            if (!visited[neighborNode] && dist[minIndex] != INT_MAX && dist[minIndex] + weight < dist[neighborNode]) {
+                dist[neighborNode] = dist[minIndex] + weight;
+                prev[neighborNode] = minIndex;
             }
             node = node->next;
         }
     }
 
     // Cari path ke TPS (node 6, index 5)
-    int target = NODE_COUNT - 1; // TPS ($)
+    int target = NODE_COUNT - 1;
     path.clear();
     totalDistance = (dist[target] == INT_MAX ? -1 : dist[target]);
     if (dist[target] == INT_MAX) {
@@ -133,13 +129,16 @@ void Graf::Dijkstra(int start, std::vector<int>& path, int& totalDistance)
         return;
     }
     // Rekonstruksi path mundur
-    vector<int> reversePath;
-    for (int at = target; at != -1; at = prev[at]) {
-        reversePath.push_back(at + 1); // Simpan 1-based
+    int at = target;
+    int tempPath[NODE_COUNT];
+    int len = 0;
+    while (at != -1) {
+        tempPath[len++] = at + 1; // Simpan 1-based
+        at = prev[at];
     }
     // Balik urutan path
-    for (auto it = reversePath.rbegin(); it != reversePath.rend(); ++it) {
-        path.push_back(*it);
+    for (int i = len - 1; i >= 0; i--) {
+        path.push_back(tempPath[i]);
     }
 }
 
