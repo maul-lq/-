@@ -392,7 +392,7 @@ void tampilanAdmin(string userInput, Antrian &laporan)
 
             std::vector<int> pathToTarget, pathFromTarget;
             int totalDistance = 0;
-            graf.DijkstraRoundTrip(idxTarget + 1, pathToTarget, pathFromTarget, totalDistance);
+            graf.Dijkstra(idxTarget + 1, pathToTarget, pathFromTarget, totalDistance);
 
             if (totalDistance == -1) {
                 printf("Tidak ada rute yang tersedia ke lokasi %s!\n", lokasi.c_str());

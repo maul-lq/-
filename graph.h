@@ -23,7 +23,7 @@ private:
 public:
     Graf(int matrix[NODE_COUNT][NODE_COUNT], int nodes[NODE_COUNT]); // Konstruktor
     void TampilkanGraf(); // Tampilkan graf
-    void Dijkstra(int start, std::vector<int>& path, int& totalDistance); // Algoritma dijkstra dengan rute
-    void DijkstraRoundTrip(int target, std::vector<int>& pathToTarget, std::vector<int>& pathFromTarget, int& totalDistance); // Dijkstra TPS -> Target -> TPS
+    // void Dijkstra(int start, std::vector<int>& path, int& totalDistance); // Algoritma dijkstra dengan rute
+    void Dijkstra(int target, std::vector<int>& pathToTarget, std::vector<int>& pathFromTarget, int& totalDistance); // Dijkstra TPS -> Target -> TPS
     ~Graf(); // Destruktor
 };

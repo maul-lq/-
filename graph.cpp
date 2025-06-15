@@ -73,97 +73,97 @@ void Graf::TampilkanGraf()
 }
 
 // Fungsi algoritma Dijkstra dengan rute dan total jarak (versi sederhana)
-void Graf::Dijkstra(int start, std::vector<int>& path, int& totalDistance)
-{
-    int dist[NODE_COUNT];
-    int prev[NODE_COUNT];
-    bool visited[NODE_COUNT];
+// void Graf::Dijkstra(int start, std::vector<int>& path, int& totalDistance)
+// {
+//     int dist[NODE_COUNT];
+//     int prev[NODE_COUNT];
+//     bool visited[NODE_COUNT];
 
-    // Inisialisasi
-    for (int i = 0; i < NODE_COUNT; i++) {
-        dist[i] = INT_MAX;
-        prev[i] = -1;
-        visited[i] = false;
-    }
-    dist[start - 1] = 0;
+//     // Inisialisasi
+//     for (int i = 0; i < NODE_COUNT; i++) {
+//         dist[i] = INT_MAX;
+//         prev[i] = -1;
+//         visited[i] = false;
+//     }
+//     dist[start - 1] = 0;
 
-    for (int count = 0; count < NODE_COUNT - 1; count++) {
-        // Cari node dengan jarak minimum yang belum dikunjungi
-        int minDist = INT_MAX, minIndex = -1;
-        for (int v = 0; v < NODE_COUNT; v++) {
-            if (!visited[v] && dist[v] <= minDist) {
-                minDist = dist[v];
-                minIndex = v;
-            }
-        }
+//     for (int count = 0; count < NODE_COUNT - 1; count++) {
+//         // Cari node dengan jarak minimum yang belum dikunjungi
+//         int minDist = INT_MAX, minIndex = -1;
+//         for (int v = 0; v < NODE_COUNT; v++) {
+//             if (!visited[v] && dist[v] <= minDist) {
+//                 minDist = dist[v];
+//                 minIndex = v;
+//             }
+//         }
 
-        if (minIndex == -1) break; // Tidak ada node yang bisa diproses
+//         if (minIndex == -1) break; // Tidak ada node yang bisa diproses
 
-        visited[minIndex] = true;
+//         visited[minIndex] = true;
 
-        // Update jarak ke tetangga
-        auto node = adjacencyLists[minIndex].getHead()->next;
-        while (node != nullptr) {
-            const std::string& neighbor = node->data;
-            size_t colonPos = neighbor.find(':');
-            if (colonPos == std::string::npos) {
-                node = node->next;
-                continue;
-            }
-            int neighborNode = std::stoi(neighbor.substr(0, colonPos)) - 1;
-            int weight = std::stoi(neighbor.substr(colonPos + 1));
-            if (!visited[neighborNode] && dist[minIndex] != INT_MAX && dist[minIndex] + weight < dist[neighborNode]) {
-                dist[neighborNode] = dist[minIndex] + weight;
-                prev[neighborNode] = minIndex;
-            }
-            node = node->next;
-        }
-    }
+//         // Update jarak ke tetangga
+//         auto node = adjacencyLists[minIndex].getHead()->next;
+//         while (node != nullptr) {
+//             const std::string& neighbor = node->data;
+//             size_t colonPos = neighbor.find(':');
+//             if (colonPos == std::string::npos) {
+//                 node = node->next;
+//                 continue;
+//             }
+//             int neighborNode = std::stoi(neighbor.substr(0, colonPos)) - 1;
+//             int weight = std::stoi(neighbor.substr(colonPos + 1));
+//             if (!visited[neighborNode] && dist[minIndex] != INT_MAX && dist[minIndex] + weight < dist[neighborNode]) {
+//                 dist[neighborNode] = dist[minIndex] + weight;
+//                 prev[neighborNode] = minIndex;
+//             }
+//             node = node->next;
+//         }
+//     }
 
-    // Cari path ke TPS (node 6, index 5)
-    int target = NODE_COUNT - 1;
-    path.clear();
-    totalDistance = (dist[target] == INT_MAX ? -1 : dist[target]);
-    if (dist[target] == INT_MAX) {
-        // Tidak ada rute
-        return;
-    }
-    // Rekonstruksi path mundur
-    int at = target;
-    int tempPath[NODE_COUNT];
-    int len = 0;
-    while (at != -1) {
-        tempPath[len++] = at + 1; // Simpan 1-based
-        at = prev[at];
-    }
-    // Balik urutan path
-    for (int i = len - 1; i >= 0; i--) {
-        path.push_back(tempPath[i]);
-    }
-}
+//     // Cari path ke TPS (node 6, index 5)
+//     int target = NODE_COUNT - 1;
+//     path.clear();
+//     totalDistance = (dist[target] == INT_MAX ? -1 : dist[target]);
+//     if (dist[target] == INT_MAX) {
+//         // Tidak ada rute
+//         return;
+//     }
+//     // Rekonstruksi path mundur
+//     int at = target;
+//     int tempPath[NODE_COUNT];
+//     int len = 0;
+//     while (at != -1) {
+//         tempPath[len++] = at + 1; // Simpan 1-based
+//         at = prev[at];
+//     }
+//     // Balik urutan path
+//     for (int i = len - 1; i >= 0; i--) {
+//         path.push_back(tempPath[i]);
+//     }
+// }
 
 // Fungsi ekspor hasil dijkstra ke file CSV
 void Graf::EksporHasil(const std::vector<int> &dist, int start)
 {
-    ofstream file("hasil_dijkstra.csv"); // Buka file output
-    if (!file.is_open())
-    {
-        cerr << "Gagal membuka file untuk ekspor!" << endl;
-        return;
-    }
+    // ofstream file("hasil_dijkstra.csv"); // Buka file output
+    // if (!file.is_open())
+    // {
+    //     cerr << "Gagal membuka file untuk ekspor!" << endl;
+    //     return;
+    // }
 
-    file << "Simpul Awal,Jarak Ke,Simpul Tujuan\n";
-    for (int i = 0; i < dist.size(); i++)
-    {
-        file << start << "," << (dist[i] == INT_MAX ? -1 : dist[i]) << "," << (i + 1) << "\n";
-    }
+    // file << "Simpul Awal,Jarak Ke,Simpul Tujuan\n";
+    // for (int i = 0; i < dist.size(); i++)
+    // {
+    //     file << start << "," << (dist[i] == INT_MAX ? -1 : dist[i]) << "," << (i + 1) << "\n";
+    // }
 
-    file.close();
-    cout << "Hasil diekspor ke 'hasil_dijkstra.csv'" << endl;
+    // file.close();
+    // cout << "Hasil diekspor ke 'hasil_dijkstra.csv'" << endl;
 }
 
 // Fungsi algoritma Dijkstra untuk rute round-trip: TPS -> Target -> TPS
-void Graf::DijkstraRoundTrip(int target, std::vector<int>& pathToTarget, std::vector<int>& pathFromTarget, int& totalDistance)
+void Graf::Dijkstra(int target, std::vector<int>& pathToTarget, std::vector<int>& pathFromTarget, int& totalDistance)
 {
     int tpsIndex = NODE_COUNT - 1; // TPS adalah node terakhir (index 5)
     int targetIndex = target - 1; // Convert ke 0-based index
