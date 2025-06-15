@@ -18,7 +18,7 @@ private:
 
     void InisialisasiSimpul(int nodes[NODE_COUNT]); // Inisialisasi simpul
     void BuatHubungan(int matrix[NODE_COUNT][NODE_COUNT]); // Buat hubungan antar simpul
-    void EksporHasil(const std::vector<int>& dist, int start); // Ekspor hasil dijkstra
+    // void EksporHasil(const std::vector<int>& dist, int start); // Ekspor hasil dijkstra
 
 public:
     Graf(int matrix[NODE_COUNT][NODE_COUNT], int nodes[NODE_COUNT]); // Konstruktor
